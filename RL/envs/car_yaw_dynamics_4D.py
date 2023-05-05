@@ -37,7 +37,7 @@ The state space is continuous 4-D. Policy network should take this as an input.
 The action space is continuous 1-D. Policy network will return 2 outputs the mean and variance of delta. 
 Perform the Gaussian reparameterization trick here:, i.e., take Gaussian variable z ~ N (0,1), and play delta = sqrt (variance) * z + mean
 reward = -1 * time * time_penalty + achievement_weight * 1 / ((new_psi - pi/2)^2) ____ time_penalty=1, achievement_weight = 2.5 * 0.1
-cost = TBD later: should be like  w_r*(r-r_ref)^2 + w_y*(y)^2 + w_lateral_velocity * (V_y - V_y_ref =0?)^2
+cost = w_r*(r-r_ref)^2 + w_y*(y)^2 + w_lateral_velocity * (V_y - V_y_ref =0?)^2
 CBF_function phi = C - cost
 DONE = TRUE iff |psi - pi/2| < 0.01
 time-horizon = 1000
@@ -63,6 +63,10 @@ class car_dynamics:
         self.y = y_init
         self.V_x = V
 
+        self.V_y_MAX = 7  # Realistic upper bounds on magnitude
+        self.r_MAX = 350  # Realistic upper bounds on magnitude
+        self.V_MAX = 11   # Realistic upper bounds on magnitude
+
         # Parameters needed to compute cost and CBF, CBF_grad
         self.continuous_time_horizon = self.tau * self.horizon
         self.r_ref = 100 * ((np.pi/2)/(self.continuous_time_horizon)) # ideally want to make the turn in 1% of the total time horizon
@@ -79,7 +83,7 @@ class car_dynamics:
         self.state_trajectory[0][3] = self.y
 
     def get_V(self):
-        return np.sqrt((self.V_x**2) + (self.V_y**2))
+        return np.clip(np.sqrt((self.V_x**2) + (self.V_y**2)),-1*self.V_MAX,self.V_MAX)
 
     def get_state_dim(self):
         return self.state_dim
@@ -135,20 +139,32 @@ class car_dynamics:
         if (self.time >= 1000):
             info = "FAIL"
             DONE = True
-        self.V_y = state[0]
-        self.r = state[1]
-        self.psi = state[2]
-        self.y = state[3]
-        reward = -1 + (0.25) * (1 / (self.psi - ((np.pi) / 2)) ** 2)
+        self.V_y = np.clip(state[0],-1*self.V_y_MAX, self.V_y_MAX)
+        self.r = np.clip(state[1],-1*self.r_MAX, self.r_MAX)
+        self.psi = self.reduce_angles_modulo_2_pi(state[2])
+        self.y = state[3]  #No such upper bound on y, but gets a high cost if this is far from zero
+        reward = -1 + (0.25) * (1 / (self.psi - ((np.pi) / 2)) ** 2 + 1e-4)
         if (np.abs((self.psi-(np.pi)/2)) < (np.pi/90)):
             DONE = True
             reward = 10
+        if (reward > 10):
+            reward = 10
 
         cost = self.w_r * (self.r-self.r_ref)**2 + self.w_y * (self.y-self.y_ref)**2 + self.w_lateral_velocity * (self.V_y - self.V_y_ref)**2
-        if np.isnan(cost):
+        if (cost > 1e+6):
             cost = 1e+6
 
         return reward, cost, DONE, info
+
+    def reduce_angles_modulo_2_pi(self, theta):
+        if ((theta >= 0) and (theta < 2*np.pi)):
+            return theta
+        else:
+            rounds = (theta//(2*np.pi))
+            theta -= rounds*(2*np.pi)
+            if theta < 0:
+                theta += 2*np.pi
+            return theta
 
     def get_CBF_phi(self):
         self.C =10
