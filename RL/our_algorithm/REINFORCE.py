@@ -17,7 +17,7 @@ from envs.car_yaw_dynamics_4D import car_dynamics
 
 # Hyperparameters
 GAMMA = 0.99
-lr = 2e-2 # started with 3e-4 but it was too slow. lr=1e-2 was decent. lr= 7e-3 slightly slow.
+lr = 1e-2 # started with 3e-4 but it was too slow. lr=1e-2 was decent. lr= 7e-3 slightly slow.
 
 
 def normal_entropy(std):
