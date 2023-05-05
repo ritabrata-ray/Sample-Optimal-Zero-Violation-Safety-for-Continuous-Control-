@@ -7,6 +7,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.autograd import Variable
 import sys
+import matplotlib.pyplot as plt
 
 sys.path.append("..")
 
@@ -189,7 +190,7 @@ def train_actor_critic_REINFORCE(actor, critic, NUM_EPOCHS = 500):
         episode_counter += 1
         while not DONE:
             state = car.get_state()
-            state = state.astype(np.float32)
+            #state = state.astype(np.float32)
             state = torch.tensor(state)
             states.append(state) #store tensor states
             action = actor.select_action(state)
@@ -235,5 +236,12 @@ epi_r , epi_c = train_actor_critic_REINFORCE(actor, critic, NUM_EPOCHS)
 print(epi_r, epi_c)  # these can be plotted against "episodes" above but they should be averaged over 5 or 10 experiments and the plots need to be with mean
 # and fill_between +_ 1 std_dev of the experiments.
 
-
+plt.plot(episodes,epi_r, label="Sum Rewards for every episode")
+plt.plot(episodes, epi_c, label="Sum Costs for every episode")
+plt.xlabel("Training episodes")
+plt.ylabel("Discounted Returns for each episode/trajectory")
+plt.title("Vanilla REINFORCE algorithm for car dynamics")
+plt.legend(loc='lower right', borderpad=0.4, labelspacing=0.7)
+#plt.savefig(os.path.join(file_path,"Bandits_Comparison.pdf"), format="pdf", bbox_inches="tight")
+plt.show()
 
