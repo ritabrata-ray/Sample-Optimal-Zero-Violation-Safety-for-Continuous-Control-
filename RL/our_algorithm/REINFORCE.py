@@ -17,7 +17,7 @@ from envs.car_yaw_dynamics_4D import car_dynamics
 
 # Hyperparameters
 GAMMA = 0.99
-lr = 1e-2 # started with 3e-4 but it was too slow. lr=1e-2 was decent. lr= 7e-3 slightly slow.
+lr = 7e-3 # started with 3e-4 was too slow. lr=1e-2 was too fast. lr= 7e-3 seems right.
 
 
 def normal_entropy(std):
@@ -37,7 +37,7 @@ def normal_log_density(x, mean, log_std, std):
 #### Continuous action generating policy network (Actor Network) ####
 
 class Policy(nn.Module):
-    def __init__(self, state_dim, action_dim, hidden_size=(100, 100), activation='tanh', log_std=0, learning_rate = lr): #earlier lr was 3e-4
+    def __init__(self, state_dim, action_dim, hidden_size=(100, 100), activation='tanh', log_std=0, learning_rate = lr): #earlier log_std was 0, trying a more certain action
         super().__init__()
         self.is_disc_action = False
         if activation == 'tanh':
