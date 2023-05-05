@@ -168,7 +168,7 @@ class car_dynamics:
         state[1] = self.r
         state[2] = self.psi
         state[3] = self.y
-        return state
+        return state.astype(np.float32)
 
     def get_state_derivative_left(self):
         x=self.state_trajectory[self.time]
@@ -180,7 +180,7 @@ class car_dynamics:
     def get_state_trajectory(self):
         return self.state_trajectory
 
-
+"""
 #Trial run with a random normal policy
 car = car_dynamics()
 car.reset()
@@ -205,6 +205,6 @@ print("Rewards:")
 print(rewards)
 print("Costs:")
 print(costs)
-
+"""
 
 
