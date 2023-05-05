@@ -17,7 +17,7 @@ from envs.car_yaw_dynamics_4D import car_dynamics
 
 # Hyperparameters
 GAMMA = 0.99
-lr = 7e-3 # started with 3e-4 was too slow. lr=1e-2 was too fast. lr= 7e-3 seems right.
+lr = 1e-2 # started with 3e-4 was too slow. lr=1e-2 seems just right. lr= 7e-3 seems slightly slow.
 
 
 def normal_entropy(std):
@@ -227,7 +227,7 @@ def train_actor_critic_REINFORCE(actor, critic, NUM_EPOCHS = 500):
         cost_returns_across_training_episodes.append(episode_cost_returns[0])
     return reward_returns_across_traning_episodes, cost_returns_across_training_episodes
 
-NUM_EPOCHS = 500 # make it 500 later
+NUM_EPOCHS = 100 # make it 500 later
 car = car_dynamics()
 episodes = np.arange(NUM_EPOCHS) # will plot this in x-axis
 actor = Policy(car.get_state_dim(), car.get_action_dim())
