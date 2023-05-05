@@ -15,9 +15,9 @@ from envs.car_yaw_dynamics_4D import car_dynamics
 
 
 
-# Constants
+# Hyperparameters
 GAMMA = 0.99
-
+lr = 7e-3 # started with 3e-4 but it was too slow. lr=1e-2 was decent.
 
 
 def normal_entropy(std):
@@ -37,7 +37,7 @@ def normal_log_density(x, mean, log_std, std):
 #### Continuous action generating policy network (Actor Network) ####
 
 class Policy(nn.Module):
-    def __init__(self, state_dim, action_dim, hidden_size=(100, 100), activation='tanh', log_std=0, learning_rate = 3e-4):
+    def __init__(self, state_dim, action_dim, hidden_size=(100, 100), activation='tanh', log_std=0, learning_rate = lr): #earlier lr was 3e-4
         super().__init__()
         self.is_disc_action = False
         if activation == 'tanh':
@@ -119,7 +119,7 @@ def update_policy(policy_network, critic_network, rewards, states, log_probs):
 
 
 class Value(nn.Module):
-    def __init__(self, state_dim, hidden_size=(100, 100), activation='tanh', learning_rate=3e-4):
+    def __init__(self, state_dim, hidden_size=(100, 100), activation='tanh', learning_rate=lr): #earlier lr was 3e-4
         super().__init__()
         if activation == 'tanh':
             self.activation = torch.tanh
@@ -223,11 +223,11 @@ def train_actor_critic_REINFORCE(actor, critic, NUM_EPOCHS = 500):
                 pw = pw + 1
             episode_cost_returns.append(Ct)
         print("INFO = {} in episode: {} after {} steps.".format(INFO,episode_counter, step_counter))
-        reward_returns_across_traning_episodes.append(episode_reward_returns[episode_counter-1])
-        cost_returns_across_training_episodes.append(episode_cost_returns[episode_counter-1])
+        reward_returns_across_traning_episodes.append(episode_reward_returns[0])
+        cost_returns_across_training_episodes.append(episode_cost_returns[0])
     return reward_returns_across_traning_episodes, cost_returns_across_training_episodes
 
-NUM_EPOCHS = 100 # make it 500 later
+NUM_EPOCHS = 500 # make it 500 later
 car = car_dynamics()
 episodes = np.arange(NUM_EPOCHS) # will plot this in x-axis
 actor = Policy(car.get_state_dim(), car.get_action_dim())
@@ -235,13 +235,21 @@ critic = Value(car.get_state_dim())
 
 epi_r , epi_c = train_actor_critic_REINFORCE(actor, critic, NUM_EPOCHS)
 
-print(epi_r, epi_c)  # these can be plotted against "episodes" above but they should be averaged over 5 or 10 experiments and the plots need to be with mean
+#print(epi_r, epi_c)  # these can be plotted against "episodes" above but they should be averaged over 5 or 10 experiments and the plots need to be with mean
 # and fill_between +_ 1 std_dev of the experiments.
 
 plt.plot(episodes,epi_r, label="Sum Rewards for every episode")
-plt.plot(episodes, epi_c, label="Sum Costs for every episode")
+#plt.plot(episodes, epi_c, label="Sum Costs for every episode")
 plt.xlabel("Training episodes")
 plt.ylabel("Discounted Returns for each episode/trajectory")
+plt.title("Vanilla REINFORCE algorithm for car dynamics")
+plt.legend(loc='lower right', borderpad=0.4, labelspacing=0.7)
+#plt.savefig(os.path.join(file_path,"Bandits_Comparison.pdf"), format="pdf", bbox_inches="tight")
+plt.show()
+
+plt.plot(episodes,epi_c, label="Sum Costs for every episode")
+plt.xlabel("Training episodes")
+plt.ylabel("Discounted Costs for each episode/trajectory")
 plt.title("Vanilla REINFORCE algorithm for car dynamics")
 plt.legend(loc='lower right', borderpad=0.4, labelspacing=0.7)
 #plt.savefig(os.path.join(file_path,"Bandits_Comparison.pdf"), format="pdf", bbox_inches="tight")
