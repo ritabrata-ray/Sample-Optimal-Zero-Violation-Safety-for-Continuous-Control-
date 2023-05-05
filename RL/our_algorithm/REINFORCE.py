@@ -10,12 +10,12 @@ import sys
 
 sys.path.append("..")
 
-from car_yaw_dynamics_4D import car_dynamics
+from envs.car_yaw_dynamics_4D import car_dynamics
 
 
 
 # Constants
-GAMMA = 0.7
+GAMMA = 0.99
 
 
 
@@ -175,8 +175,8 @@ def update_critic(critic_network, rewards, states):
 def train_actor_critic_REINFORCE(actor, critic, NUM_EPOCHS = 500):
     car = car_dynamics()  # instantiating car object
     episode_counter = 0
-    episode_reward_returns = []
-    episode_cost_returns = []
+    reward_returns_across_traning_episodes = []
+    cost_returns_across_training_episodes = []
     for epoch in range(NUM_EPOCHS):
         car.reset()
         rewards = []
@@ -204,6 +204,8 @@ def train_actor_critic_REINFORCE(actor, critic, NUM_EPOCHS = 500):
         update_policy(actor, critic, rewards, states, log_probs)
         update_critic(critic, rewards, states)
         # Now we store the sum_rewards and sum_costs (Discounted) for each episode
+        episode_reward_returns = []
+        episode_cost_returns = []
         for t in range(len(rewards)):
             Gt = 0
             Ct = 0
@@ -218,7 +220,9 @@ def train_actor_critic_REINFORCE(actor, critic, NUM_EPOCHS = 500):
                 pw = pw + 1
             episode_cost_returns.append(Ct)
         print("INFO = {} in episode: {}".format(INFO,episode_counter))
-    return episode_reward_returns, episode_cost_returns
+        reward_returns_across_traning_episodes.append(episode_reward_returns[episode_counter-1])
+        cost_returns_across_training_episodes.append(episode_cost_returns[episode_counter-1])
+    return reward_returns_across_traning_episodes, cost_returns_across_training_episodes
 
 NUM_EPOCHS = 10 # make it 500 later
 car = car_dynamics()
