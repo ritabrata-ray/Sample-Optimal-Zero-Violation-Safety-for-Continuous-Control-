@@ -99,7 +99,7 @@ def update_policy(policy_network, critic_network, rewards, states, log_probs):
         for r in rewards[t:]:
             Gt = Gt + GAMMA ** pw * r
             pw = pw + 1
-            At = Gt - critic_network(state_t)
+            At = Gt - critic_network(state_t).detach()
         discounted_advantages.append(At)
 
     discounted_advantages = torch.tensor(discounted_advantages)
