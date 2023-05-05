@@ -143,12 +143,12 @@ class car_dynamics:
         self.r = np.clip(state[1],-1*self.r_MAX, self.r_MAX)
         self.psi = self.reduce_angles_modulo_2_pi(state[2])
         self.y = state[3]  #No such upper bound on y, but gets a high cost if this is far from zero
-        reward = -1 + (0.25) * (1 / (self.psi - ((np.pi) / 2)) ** 2 + 1e-4)
+        reward = -4 + (0.25) * (1 / (self.psi - ((np.pi) / 2)) ** 2 + 1e-4)
         if (np.abs((self.psi-(np.pi)/2)) < (np.pi/36)):
             DONE = True
-            reward = 10
-        if (reward > 10):
-            reward = 10
+            reward = 100
+        if (reward > 100):
+            reward = 100
 
         cost = self.w_r * (self.r-self.r_ref)**2 + self.w_y * (self.y-self.y_ref)**2 + self.w_lateral_velocity * (self.V_y - self.V_y_ref)**2
         if (cost > 1e+2):
