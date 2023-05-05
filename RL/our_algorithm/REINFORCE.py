@@ -188,9 +188,11 @@ def train_actor_critic_REINFORCE(actor, critic, NUM_EPOCHS = 500):
         DONE = False
         INFO = ""
         episode_counter += 1
+        step_counter=0
         while not DONE:
+            step_counter += 1
             state = car.get_state()
-            #state = state.astype(np.float32)
+            #state = state.astype(np.float32) #This is being done inside the environment file.
             state = torch.tensor(state)
             states.append(state) #store tensor states
             action = actor.select_action(state)
@@ -220,12 +222,12 @@ def train_actor_critic_REINFORCE(actor, critic, NUM_EPOCHS = 500):
                 Ct = Ct + GAMMA ** pw * c
                 pw = pw + 1
             episode_cost_returns.append(Ct)
-        print("INFO = {} in episode: {}".format(INFO,episode_counter))
+        print("INFO = {} in episode: {} after {} steps.".format(INFO,episode_counter, step_counter))
         reward_returns_across_traning_episodes.append(episode_reward_returns[episode_counter-1])
         cost_returns_across_training_episodes.append(episode_cost_returns[episode_counter-1])
     return reward_returns_across_traning_episodes, cost_returns_across_training_episodes
 
-NUM_EPOCHS = 10 # make it 500 later
+NUM_EPOCHS = 100 # make it 500 later
 car = car_dynamics()
 episodes = np.arange(NUM_EPOCHS) # will plot this in x-axis
 actor = Policy(car.get_state_dim(), car.get_action_dim())
