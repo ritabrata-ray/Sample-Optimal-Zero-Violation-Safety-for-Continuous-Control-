@@ -153,6 +153,7 @@ class car_dynamics:
         cost = self.w_r * (self.r-self.r_ref)**2 + self.w_y * (self.y-self.y_ref)**2 + self.w_lateral_velocity * (self.V_y - self.V_y_ref)**2
         if (cost > 1e+2):
             cost = 1e+2
+        cost /= 1000
 
         return reward, cost, DONE, info
 
