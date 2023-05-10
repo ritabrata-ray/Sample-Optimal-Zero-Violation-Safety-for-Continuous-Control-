@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import gym
 from copy import deepcopy
+import matplotlib.pyplot as plt
 
 # torch.autograd.set_detect_anomaly(True)
 
@@ -40,6 +41,10 @@ def ppo_lagrangian(env_name, epochs=10, batch_size=64, gamma=0.99, clip_ratio=0.
     agent = ActorCritic(obs_space, action_space)
     optimizer = optim.Adam(agent.parameters(), lr=lr, betas=betas)
 
+    # Initialize lists to record rewards and losses
+    total_rewards = []
+    total_losses = []
+
     # Run the training loop
     for epoch in range(epochs):
         obs_batch = []
@@ -48,7 +53,7 @@ def ppo_lagrangian(env_name, epochs=10, batch_size=64, gamma=0.99, clip_ratio=0.
         value_batch = []
         log_prob_batch = []
 
-        obs, info = env.reset()
+        obs = env.reset()
         done = False
         while True:
             obs = torch.FloatTensor(obs).unsqueeze(0)
@@ -58,7 +63,7 @@ def ppo_lagrangian(env_name, epochs=10, batch_size=64, gamma=0.99, clip_ratio=0.
 
             obs_batch.append(deepcopy(obs))
             action_batch.append(action)
-            obs, reward, done,truncate, info = env.step(action)
+            obs, reward, done, truncate = env.step(action)
 
             reward_batch.append(reward)
             value_batch.append(value)
@@ -104,9 +109,20 @@ def ppo_lagrangian(env_name, epochs=10, batch_size=64, gamma=0.99, clip_ratio=0.
         # total_loss.backward()
         optimizer.step()
 
+        # Record the total reward and loss for the epoch
+        total_rewards.append(sum(reward_batch))
+        total_losses.append(total_loss / batch_size)
+        
         print(f"Epoch: {epoch} Loss: {total_loss/batch_size:.4e} rewards: {sum(reward_batch)}")
 
     env.close()
+    
+    # Plot the rewards and losses
+    plt.plot(total_rewards)
+    plt.title("Total Rewards per Epoch")
+    plt.xlabel("Epoch")
+    plt.ylabel("Total Reward")
+    plt.show()
 
 #Write Main function here
 env_name = 'CartPole-v1'
