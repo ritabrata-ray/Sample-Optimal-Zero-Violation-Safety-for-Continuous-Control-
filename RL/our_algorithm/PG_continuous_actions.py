@@ -11,7 +11,10 @@ import numpy as np
 sys.path.append("..")
 
 from envs.car_yaw_dynamics_4D import car_dynamics
+from our_algorithm.correction_controller import *
 
+theta = 100
+eta = 500
 
 
 class Policy(nn.Module):
@@ -32,9 +35,13 @@ input_size = car.get_state_dim()
 hidden_size = 100
 output_size = car.get_action_dim()
 lr = 0.001
+lr = 1e-2
 GAMMA = 0.99
+#betas = (0.9, 0.999)
+#eps = 1e-8
 
 policy = Policy(input_size, hidden_size, output_size)
+#optimizer = optim.Adam(policy.parameters(), lr=lr, betas = betas, eps = eps)
 optimizer = optim.Adam(policy.parameters(), lr=lr)
 
 
@@ -61,12 +68,12 @@ def update_policy(policy, optimizer, rewards, log_probs):
     optimizer.step()
 
 
-n_episodes = 2000
+n_episodes = 500
 max_timesteps = 1000
 
 reward_returns_across_traning_episodes = []
 cost_returns_across_training_episodes = []
-
+safety_rate = []
 
 for i_episode in range(n_episodes):
     car.reset()
@@ -77,26 +84,30 @@ for i_episode in range(n_episodes):
     DONE = False
     step_counter = 0
     INFO = " "
+    safety_counter = 0
     while not DONE:
         state = car.get_state()
         state = torch.tensor(state)
         action_mean = policy(state)
-        action_std = torch.tensor([0.4]) #0.1 for mountain car with action clamped between +-1
+        action_std = torch.tensor([0.7]) #0.1 for mountain car with action clamped between +-1
         action_dist = Normal(action_mean, action_std)
         action = action_dist.sample()
         action = torch.clamp(action, -10.0, 10.0)
         log_prob = action_dist.log_prob(action)
         log_probs.append(log_prob)
         step_counter += 1
+        if (car.get_CBF_phi()>0):
+            safety_counter +=1
         action = action.detach().numpy()
         action = action[0]
+        #action = correction_controller(car, action, theta, eta)
         reward, cost, DONE, INFO = car.step(action)
         rewards.append(reward)
         costs.append(cost)
         actions.append(action)
 
 
-
+    safety_rate.append(safety_counter/step_counter)
     update_policy(policy, optimizer, rewards, log_probs)
     episode_reward_returns = []
     episode_cost_returns = []
@@ -114,7 +125,6 @@ for i_episode in range(n_episodes):
             pw = pw + 1
         episode_cost_returns.append(Ct)
     print("INFO = {} in episode: {} after {} steps.".format(INFO, i_episode+1, step_counter))
-    print("Actions like: {}".format(actions[step_counter-1]))
     reward_returns_across_traning_episodes.append(episode_reward_returns[0])
     cost_returns_across_training_episodes.append(episode_cost_returns[0])
 
@@ -135,6 +145,15 @@ plt.plot(episodes,cost_returns_across_training_episodes, label="Sum Costs for ev
 plt.xlabel("Training episodes")
 plt.ylabel("Discounted Costs for each episode/trajectory")
 plt.title("Vanilla REINFORCE algorithm for car dynamics")
-plt.legend(loc='lower right', borderpad=0.4, labelspacing=0.7)
+plt.legend(loc='upper right', borderpad=0.4, labelspacing=0.7)
+#plt.savefig(os.path.join(file_path,"Bandits_Comparison.pdf"), format="pdf", bbox_inches="tight")
+plt.show()
+
+
+plt.plot(episodes,safety_rate, label="Safety_rate")
+plt.xlabel("Training episodes")
+plt.ylabel("Fraction of time system was safe")
+plt.title("Fraction of time safe during each episode")
+plt.legend(loc='upper right', borderpad=0.4, labelspacing=0.7)
 #plt.savefig(os.path.join(file_path,"Bandits_Comparison.pdf"), format="pdf", bbox_inches="tight")
 plt.show()

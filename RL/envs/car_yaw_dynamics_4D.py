@@ -73,7 +73,7 @@ class car_dynamics:
         self.y_ref = 0 # don't like lateral movement of the car, V_y should go from 0 to V, so V_y should not be on a different scale
         self.V_y_ref = V/2
         self.w_r = 4  #may tune them later
-        self.w_y = 1  #may tune them later
+        self.w_y = 10  #may tune them later, was 1 earlier
         self.w_lateral_velocity = 0.01 # Only matters if the lateral velocity exceeds the right scales, may tune it later!
 
         self.state_trajectory = np.zeros((self.horizon + 1, self.state_dim))
@@ -116,7 +116,7 @@ class car_dynamics:
         g[0][0] = ((C_alpha_f)/(m))
         g[1][0] = ((a*(C_alpha_f))/I_z)
         g[2][0] = 0
-        g[3][0] = 0
+        g[3][0] = 0 # actually 0; trying 10 to check controllability in safety
         return g
 
     # Function to run the dynamics
@@ -146,9 +146,9 @@ class car_dynamics:
         reward = -4 + (0.25) * (1 / (self.psi - ((np.pi) / 2)) ** 2 + 1e-4)
         if (np.abs((self.psi-(np.pi)/2)) < (np.pi/36)):
             DONE = True
-            reward = 100
-        if (reward > 100):
-            reward = 100
+            reward = 7000
+        if (reward > 7000):
+            reward = 7000
 
         cost = self.w_r * (self.r-self.r_ref)**2 + self.w_y * (self.y-self.y_ref)**2 + self.w_lateral_velocity * (self.V_y - self.V_y_ref)**2
         if (cost > 1e+2):
@@ -168,7 +168,7 @@ class car_dynamics:
             return theta
 
     def get_CBF_phi(self):
-        self.C =10
+        self.C = 10000
         return self.C - (self.w_r * (self.r-self.r_ref)**2 + self.w_y * (self.y-self.y_ref)**2 + self.w_lateral_velocity * (self.V_y - self.V_y_ref)**2)
 
     def get_CBF_grad_phi(self):
