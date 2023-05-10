@@ -89,7 +89,7 @@ for i_episode in range(n_episodes):
         state = car.get_state()
         state = torch.tensor(state)
         action_mean = policy(state)
-        action_std = torch.tensor([0.4]) #0.1 for mountain car with action clamped between +-1
+        action_std = torch.tensor([0.7]) #0.1 for mountain car with action clamped between +-1
         action_dist = Normal(action_mean, action_std)
         action = action_dist.sample()
         action = torch.clamp(action, -10.0, 10.0)
