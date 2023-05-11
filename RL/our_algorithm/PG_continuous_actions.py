@@ -100,7 +100,7 @@ for i_episode in range(n_episodes):
             safety_counter +=1
         action = action.detach().numpy()
         action = action[0]
-        #action = correction_controller(car, action, theta, eta)
+        action = correction_controller(car, action, theta, eta)
         reward, cost, DONE, INFO = car.step(action)
         rewards.append(reward)
         costs.append(cost)
@@ -157,3 +157,7 @@ plt.title("Fraction of time safe during each episode")
 plt.legend(loc='upper right', borderpad=0.4, labelspacing=0.7)
 #plt.savefig(os.path.join(file_path,"Bandits_Comparison.pdf"), format="pdf", bbox_inches="tight")
 plt.show()
+
+for episode in range(n_episodes):
+    if (safety_rate[episode] < 1):
+        print("System was unsafe in Episode:", episode+1)
