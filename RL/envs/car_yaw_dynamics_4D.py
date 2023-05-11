@@ -73,8 +73,8 @@ class car_dynamics:
         self.y_ref = 0 # don't like lateral movement of the car, V_y should go from 0 to V, so V_y should not be on a different scale
         self.V_y_ref = V/2
         self.w_r = 4  #may tune them later
-        self.w_y = 10  #may tune them later, was 1 earlier
-        self.w_lateral_velocity = 0.01 # Only matters if the lateral velocity exceeds the right scales, may tune it later!
+        self.w_y = 0  #may tune them later, was 1 earlier
+        self.w_lateral_velocity = 0.001 # Only matters if the lateral velocity exceeds the right scales, may tune it later!
 
         self.state_trajectory = np.zeros((self.horizon + 1, self.state_dim))
         self.state_trajectory[0][0] = self.V_y
@@ -168,7 +168,7 @@ class car_dynamics:
             return theta
 
     def get_CBF_phi(self):
-        self.C = 10000
+        self.C = 400
         return self.C - (self.w_r * (self.r-self.r_ref)**2 + self.w_y * (self.y-self.y_ref)**2 + self.w_lateral_velocity * (self.V_y - self.V_y_ref)**2)
 
     def get_CBF_grad_phi(self):
