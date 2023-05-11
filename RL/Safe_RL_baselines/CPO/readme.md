@@ -1,2 +1,2 @@
 
-Alanis please add your CPO code here using the car_yaw_dynamics environment in RL/envs.
+Run main.py and edit parameters in argument_parsing.py. main.py will create 3 text files for each experiment that can be averaged with data from other experiments for plots. 
