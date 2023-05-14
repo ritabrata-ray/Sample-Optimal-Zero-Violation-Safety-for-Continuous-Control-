@@ -73,7 +73,7 @@ if args.model_path is None:
     if False and is_disc_action:
         policy_net = DiscretePolicy(state_dim, action_dim)
     else:
-        policy_net = Policy(state_dim, action_dim, env, log_std=args.log_std)
+        policy_net = Policy(state_dim, action_dim, env, log_std=random.uniform(-0.001,0.003))
     value_net = Value(state_dim)
 else:
     policy_net, value_net, running_state = pickle.load(open(args.model_path, "rb"))
