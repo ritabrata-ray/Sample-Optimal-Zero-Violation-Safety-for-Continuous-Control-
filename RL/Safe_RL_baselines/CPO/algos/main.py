@@ -77,6 +77,7 @@ if args.model_path is None:
         if(x<-0.001):
             while(x<-0.001):
                 x=0.003-random.random()*0.003
+                print(x)
         policy_net = Policy(state_dim, action_dim, env, log_std=x)
     value_net = Value(state_dim)
 else:
@@ -253,13 +254,13 @@ def main_loop():
     for i in range(len(env_avg_reward)):
         cost_loss_list[i] = cost_loss_list[i].detach().numpy()
     
-    with open("reward"+str(0)+".txt", 'w') as f:
+    with open("reward"+str(9)+".txt", 'w') as f:
         for line in eval_avg_reward:
             f.write(f"{line}\n")
-    with open("cost"+str(0)+".txt", 'w') as f:
+    with open("cost"+str(9)+".txt", 'w') as f:
         for line in cost_loss_list:
             f.write(f"{line}\n")
-    with open("score"+str(0)+".txt", 'w') as f:
+    with open("score"+str(9)+".txt", 'w') as f:
         for line in cost_loss_list:
             f.write(f"{line}\n")
 
