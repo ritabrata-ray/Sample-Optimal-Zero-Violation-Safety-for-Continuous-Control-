@@ -74,6 +74,9 @@ if args.model_path is None:
         policy_net = DiscretePolicy(state_dim, action_dim)
     else:
         x=0.003-random.random()*0.003
+        if(x<-0.001):
+            while(x<-0.001):
+                x=0.003-random.random()*0.003
         policy_net = Policy(state_dim, action_dim, env, log_std=x)
     value_net = Value(state_dim)
 else:
