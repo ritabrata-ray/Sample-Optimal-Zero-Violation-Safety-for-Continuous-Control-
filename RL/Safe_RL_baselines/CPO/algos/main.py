@@ -5,6 +5,7 @@ import sys
 import pickle
 import time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+data_path = sys.path[0]
 import matplotlib.pyplot as plt
 from contenv.RL.envs.car_yaw_dynamics_4D import *
 import numpy as np
