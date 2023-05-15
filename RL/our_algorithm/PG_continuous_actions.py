@@ -10,10 +10,12 @@ import numpy as np
 
 sys.path.append("..")
 
+data_path = "/Users/ritabrataray/Desktop/neurips_2023/code/RL/our_algorithm/simulation_data"
+
 from envs.car_yaw_dynamics_4D import car_dynamics
 from our_algorithm.correction_controller import *
 
-theta = 100
+theta = 500
 eta = 500
 
 
@@ -74,6 +76,7 @@ max_timesteps = 1000
 reward_returns_across_traning_episodes = []
 cost_returns_across_training_episodes = []
 safety_rate = []
+episode_lengths = []
 
 for i_episode in range(n_episodes):
     car.reset()
@@ -100,7 +103,7 @@ for i_episode in range(n_episodes):
             safety_counter +=1
         action = action.detach().numpy()
         action = action[0]
-        action = correction_controller(car, action, theta, eta)
+        #action = correction_controller(car, action, theta, eta)
         reward, cost, DONE, INFO = car.step(action)
         rewards.append(reward)
         costs.append(cost)
@@ -125,6 +128,7 @@ for i_episode in range(n_episodes):
             pw = pw + 1
         episode_cost_returns.append(Ct)
     print("INFO = {} in episode: {} after {} steps.".format(INFO, i_episode+1, step_counter))
+    episode_lengths.append(step_counter)
     reward_returns_across_traning_episodes.append(episode_reward_returns[0])
     cost_returns_across_training_episodes.append(episode_cost_returns[0])
 
@@ -161,3 +165,7 @@ plt.show()
 for episode in range(n_episodes):
     if (safety_rate[episode] < 1):
         print("System was unsafe in Episode:", episode+1)
+
+np.save(os.path.join(data_path,'UnSafe_RL_safety_rate_10'),safety_rate)
+np.save(os.path.join(data_path,'UnSafe_RL_reward_returns_10'),reward_returns_across_traning_episodes)
+np.save(os.path.join(data_path,'UnSafe_RL_episode_lengths_10'),episode_lengths)
