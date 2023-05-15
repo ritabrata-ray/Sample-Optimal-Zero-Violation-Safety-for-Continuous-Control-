@@ -57,7 +57,7 @@ def collect_samples(pid, queue, env, policy, custom_reward,
         score = 0
         count = 0
         
-        for t in range(10000):
+        for t in range(1000):
             #select an action with the policy
             state_var = tensor(state).unsqueeze(0)
             '''
@@ -114,6 +114,7 @@ def collect_samples(pid, queue, env, policy, custom_reward,
     log['max_reward'] = max_reward
     log['min_reward'] = min_reward
     log['env_reward_ep_list'] = env_reward_episode_list
+    log['total_score'] = total_score
 
     if queue is not None:
         queue.put([pid, memory, log])
@@ -145,6 +146,8 @@ def merge_log(log_list):
     reward_episode_list_variance = reward_episode_list_sum / log['num_episodes']
     reward_episode_list_std = np.sqrt(reward_episode_list_variance)
     log['std_reward']  = reward_episode_list_std
+    log['episode_length'] = log['num_steps']/log['num_episodes']
+    log['episode_safety_rate'] = sum([x['total_score'] for x in log_list])/log['num_steps']
     
     return log
 
