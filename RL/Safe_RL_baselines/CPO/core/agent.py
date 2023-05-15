@@ -88,7 +88,8 @@ def collect_samples(pid, queue, env, policy, custom_reward,
             if render:
                 env.render()
             if done:
-                if(num_steps!=0):print(num_steps)
+                if(num_steps!=0):
+                    done = True
                 break
 
             state = next_state
