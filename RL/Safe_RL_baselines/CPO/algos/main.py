@@ -7,6 +7,7 @@ import time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import matplotlib.pyplot as plt
 from contenv.RL.envs.car_yaw_dynamics_4D import *
+import numpy as np
 
 from utils import *
 import statistics as st
@@ -146,6 +147,8 @@ def main_loop():
     total_num_steps = []
     tne = 0 #cummulative number of episodes
     tns = 0 #cummulative number of steps
+    cpo_num_steps = []
+    cpo_safety_rate = []
     
     # lists for dumping plotting data for mean agent
     eval_avg_reward = []
@@ -190,6 +193,13 @@ def main_loop():
         tns = tns + log['num_steps']
         total_num_episodes.append(tne)
         total_num_steps.append(tns)
+        epi_length = log['episode_length']
+        epi_s_r = log['episode_safety_rate']
+        print("Total number of steps:",epi_length )
+        print("with episode_safety_rate:", epi_s_r)
+        print("in episode:", i_iter+1)
+        cpo_num_steps.append(epi_length)
+        cpo_safety_rate.append(epi_s_r)
         
         # update tensorboard summaries
         writer.add_scalars('losses', {'v_loss':v_loss}, i_iter)
@@ -199,6 +209,8 @@ def main_loop():
         writer.add_scalar('env_avg_reward', log['env_avg_reward'], i_iter)
         writer.add_scalar('num of episodes', log['num_episodes'], i_iter)
         writer.add_scalar('num of steps', log['num_steps'], i_iter)
+        #writer.add_scalars('average_episode_lengths', log['episode_length'], i_iter)
+        #writer.add_scalars('average_episodic_safety_rate', log['episode_safety_rate'], i_iter)
 
         # evaluate the current policy
         running_state.fix = True  #Fix the running state
@@ -249,7 +261,9 @@ def main_loop():
         
     # dump expert_avg_reward, num_of_steps, num_of_episodes
     save_info_obj.dump_lists(best_avg_reward, num_of_steps, num_of_episodes, total_num_episodes, total_num_steps, rewards_std, env_avg_reward, v_loss_list, p_loss_list, eval_avg_reward, eval_avg_reward_std)
-
+    # save .npy files for episode lengths and safety rates
+    np.save(os.path.join(data_path, 'CPO_RL_episode_lengths_1'), cpo_num_steps)
+    np.save(os.path.join(data_path, 'CPO_RL_safety_rate_1'), cpo_safety_rate)
 # To detach each tensor in the list
     for i in range(len(env_avg_reward)):
         cost_loss_list[i] = cost_loss_list[i].detach().numpy()
