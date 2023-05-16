@@ -28,7 +28,7 @@ def parse_all_arguments():
                         help='gae (default: 0.95)')
     parser.add_argument('--l2-reg', type=float, default=1e-3, metavar='G',
                         help='l2 regularization of value function (default: 1e-3)')
-    parser.add_argument('--learning-rate', type=float, default=1e-3, metavar='G',
+    parser.add_argument('--learning-rate', type=float, default=7e-4, metavar='G',
                         help='gae (default: 3e-4)')
     
     # GPU index, multi-threading and seeding
@@ -39,9 +39,9 @@ def parse_all_arguments():
                         help='random seed (default: 1)')
     
     # batch size and iteration number
-    parser.add_argument('--min-batch-size', type=int, default=2000, metavar='N',
+    parser.add_argument('--min-batch-size', type=int, default=10, metavar='N',
                         help='minimal batch size per PPO update (default: 2048)')
-    parser.add_argument('--max-batch-size', type=int, default=2000, metavar='N',
+    parser.add_argument('--max-batch-size', type=int, default=20, metavar='N',
                         help='maximum batch size per PPO update (default: 2000)')
     parser.add_argument('--max-iter-num', type=int, default=500, metavar='N',
                         help='maximal number of main iterations (default: 500)')
