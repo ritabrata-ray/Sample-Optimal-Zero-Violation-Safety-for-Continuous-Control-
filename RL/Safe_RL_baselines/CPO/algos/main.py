@@ -79,7 +79,7 @@ if args.model_path is None:
         if(x<-0.001):
             while(x<-0.001):
                 x=0.003-random.random()*0.003
-                print(x)
+                #print(x)
         policy_net = Policy(state_dim, action_dim, env, log_std=x)
     value_net = Value(state_dim)
 else:
@@ -263,8 +263,8 @@ def main_loop():
     # dump expert_avg_reward, num_of_steps, num_of_episodes
     save_info_obj.dump_lists(best_avg_reward, num_of_steps, num_of_episodes, total_num_episodes, total_num_steps, rewards_std, env_avg_reward, v_loss_list, p_loss_list, eval_avg_reward, eval_avg_reward_std)
     # save .npy files for episode lengths and safety rates
-    np.save(os.path.join(data_path, 'CPO_RL_episode_lengths_1'), cpo_num_steps)
-    np.save(os.path.join(data_path, 'CPO_RL_safety_rate_1'), cpo_safety_rate)
+    np.save(os.path.join(data_path, 'CPO_RL_episode_lengths_4'), cpo_num_steps)
+    np.save(os.path.join(data_path, 'CPO_RL_safety_rate_4'), cpo_safety_rate)
 # To detach each tensor in the list
     for i in range(len(env_avg_reward)):
         cost_loss_list[i] = cost_loss_list[i].detach().numpy()
