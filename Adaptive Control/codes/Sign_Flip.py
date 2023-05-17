@@ -17,7 +17,8 @@ plot_path=os.path.join(base_path,"plots")
 N=1000
 t=np.arange(N)*(1/4000)
 
-x_0=[0.1999]
+#x_0=[0.1999]
+x_0=[0.2500] #Now starting at an unsafe position to see recovery.
 
 def f (x):
     return 1.5*x

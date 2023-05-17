@@ -46,7 +46,7 @@ plt.bar(algorithms, forward_convergence_times, color=['g','y','c','k','m','b'],w
 
 plt.xlabel("Adaptive Safe Control Algorithm")
 plt.ylabel("Time after which the system becomes safe")
-plt.title("Forward convergence times for different safe control algorithms")
+#plt.title("Forward convergence times for different safe control algorithms")
 plt.savefig(os.path.join(plot_path,"Bar_Forward_Convergence_Plot.png"),format="png", bbox_inches="tight")
 plt.show()
 

@@ -18,7 +18,8 @@ N=1000
 t=np.arange(N)*(1/4000)
 
 
-x_0=[0.1999]
+#x_0=[0.1999]
+x_0=[0.2500] #Now starting at an unsafe position to see recovery.
 theta_est_0=0
 
 def f (x):
