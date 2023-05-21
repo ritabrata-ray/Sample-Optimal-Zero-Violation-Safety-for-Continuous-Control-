@@ -101,7 +101,7 @@ def correction_controller(car, u_nominal, theta, eta):
     #Finally compute the correction control:
     u_corr = u_nominal - np.matmul(hat_g_pseudo_inverse, np.matmul(Gamma_matrix, dot_x_minus))
     #print("Correction control applied = ", np.clip(u_corr[0], -1000, 1000))
-    return np.clip(u_corr[0], -1000, 1000) # return just the floating point value, no array
+    return np.clip(u_corr[0], -100, 100) # return just the floating point value, no array
 
 """
 car = car_dynamics()
