@@ -168,7 +168,7 @@ class car_dynamics:
             return theta
 
     def get_CBF_phi(self):
-        self.C = 350
+        self.C = 200
         return self.C - (self.w_r * (self.r-self.r_ref)**2 + self.w_y * (self.y-self.y_ref)**2 + self.w_lateral_velocity * (self.V_y - self.V_y_ref)**2)
 
     def get_CBF_grad_phi(self):
